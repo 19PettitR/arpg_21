@@ -16,7 +16,7 @@ var current_save : Dictionary = {
 		pos_y = 0
 	},
 	items = [],
-	persistance = [],
+	persistence = [],
 	quests = [],
 }
 
@@ -70,7 +70,7 @@ func update_player_data() -> void:
 	current_save.player.pos_y = p.global_position.y
 
 
-## SAVING
+## SAVING SCENE
 func update_scene_path() -> void:
 	var p : String = ""
 	# get children of the root
@@ -82,6 +82,23 @@ func update_scene_path() -> void:
 	current_save.scene_path = p
 
 
-## SAVING
+## SAVING INVENTORY
 func update_item_data() -> void:
 	current_save.items = PlayerManager.INVENTORY_DATA.get_save_data()
+
+
+
+## ADD PERSISTENT VALUE (EVEN WHEN NOT SAVING)
+func add_persistent_value( value : String ) -> void:
+	# if the persistent value we want to add is not present already, add it
+	if check_persistent_value( value ) == false:
+		current_save.persistence.append( value )
+	pass
+
+
+## CHECKING WHETHER CERTAIN PERSISTENCE IS PRESENT (either to add to the save or to load)
+func check_persistent_value( value : String ) -> bool:
+	# p is the persistent item array
+	var p = current_save.persistence as Array
+	# returns true if the array contains value we pass in
+	return p.has( value )

@@ -11,6 +11,7 @@ var is_open : bool = false
 @onready var label: Label = $ItemSprite/Label
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 @onready var interact_area: Area2D = $Area2D
+@onready var is_open_data: PersistentDataHandler = $IsOpen
 
 
 
@@ -23,8 +24,21 @@ func _ready() -> void:
 		return
 	interact_area.area_entered.connect( _on_area_enter )
 	interact_area.area_exited.connect( _on_area_exit )
+	# connect to the signal of the persistent data handler for this treasure chest
+	is_open_data.data_loaded.connect( set_chest_state )
+	# function needs to be called when the code starts as well as when signal is emitted
+	set_chest_state()
 	pass
 
+
+
+func set_chest_state() -> void:
+	is_open = is_open_data.value
+	# if we find the chest is open, open it
+	if is_open:
+		animation_player.play("opened")
+	else:
+		animation_player.play("closed")
 
 
 func player_interact() -> void:
@@ -32,6 +46,8 @@ func player_interact() -> void:
 		return
 	# open the chest if it isn't already open when the player interacts
 	is_open = true
+	# set the persistence value to be open
+	is_open_data.set_value()
 	animation_player.play("open_chest")
 	if item_data and quantity > 0:
 		PlayerManager.INVENTORY_DATA.add_item( item_data, quantity )
